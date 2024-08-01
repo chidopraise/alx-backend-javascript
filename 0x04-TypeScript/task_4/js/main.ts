@@ -1,15 +1,18 @@
-import { Teacher } from './Teacher';
-import { Cpp, Java, React } from './Subject';
-
-// Create constants for the subjects
-const cpp = new Cpp();
-const java = new Java();
-const react = new React();
+import { Cpp } from './subject/Cpp';
+import { Java } from './subject/Java';
+import { React } from './subject/React';
+import { Teacher } from './subject/Teacher';
+import { subject } from './subject/subject';
 
 // Create a teacher object
 const cTeacher: Teacher = {
     experienceTeachingC: 10,
 };
+
+// Create constants for the subjects
+const cpp = new Cpp();
+const java = new Java();
+const react = new React();
 
 // Log information for Cpp
 console.log("C++");
