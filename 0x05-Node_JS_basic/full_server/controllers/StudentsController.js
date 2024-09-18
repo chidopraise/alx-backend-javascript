@@ -1,34 +1,31 @@
 const readDatabase = require('../utils');
 
 class StudentsController {
-  static getAllStudents(request, response, path) {
-    readDatabase(path).then((data) => {
-      response.status = 200;
-      let res = '';
-      for (const [key, value] of Object.entries(data)) {
-        res += `Number of students in ${key}: ${value.length}. List: ${value.join(', ')}\n`;
+  static getAllStudents(request, response) {
+    readDatabase(process.argv[2].toString()).then((students) => {
+      const output = [];
+      output.push('This is the list of our students');
+      const keys = Object.keys(students);
+      keys.sort();
+      for (let i = 0; i < keys.length; i += 1) {
+        output.push(`Number of students in ${keys[i]}: ${students[keys[i]].length}. List: ${students[keys[i]].join(', ')}`);
       }
-      res = `This is the list of our students\n${res.slice(0, -1)}`;
-      response.send(res);
-    }).catch((err) => {
-      response.status(500);
-      response.send(err.message);
+      response.status(200).send(output.join('\n'));
+    }).catch(() => {
+      response.status(500).send('Cannot load the database');
     });
   }
 
-  static getAllStudentsByMajor(request, response, path) {
-    readDatabase(path).then((data) => {
-      if (request.path === '/CS') {
-        response.send(`List: ${data.CS}`);
-      } else if (request.path === '/SWE') {
-        response.send(`List: ${data.SWE}`);
+  static getAllStudentsByMajor(request, response) {
+    const field = request.params.major;
+    readDatabase(process.argv[2].toString()).then((students) => {
+      if (!(field in students)) {
+        response.status(500).send('Major parameter must be CS or SWE');
       } else {
-        response.status(500);
-        response.send('Major parameter must be CS or SWE');
+        response.status(200).send(`List: ${students[field].join(', ')}`);
       }
-    }).catch((err) => {
-      response.status(500);
-      response.send(err.message);
+    }).catch(() => {
+      response.status(500).send('Cannot load the database');
     });
   }
 }

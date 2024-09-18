@@ -1,34 +1,26 @@
-const fs = require('fs');
+const { readFile } = require('fs');
 
-function readDatabase(path) {
+module.exports = function readDatabase(filePath) {
+  const students = {};
   return new Promise((resolve, reject) => {
-    fs.readFile(path, 'utf8', (err, datatext) => {
+    readFile(filePath, (err, data) => {
       if (err) {
-        reject(Error('Cannot load the database'));
+        reject(err);
       } else {
-        const datatxt = datatext.split(/\r?\n/);
-        const data = [];
-        for (const i of datatxt) {
-          if (i !== '') {
-            data.push(i.split(','));
-          }
-        }
-        const idxFN = data[0].indexOf('firstname');
-        const idxFD = data[0].indexOf('field');
-        const dict = {};
-        for (const line of data) {
-          if (data.indexOf(line) !== 0) {
-            if (line[idxFD] in dict) {
-              dict[line[idxFD]].push(line[idxFN]);
+        const lines = data.toString().split('\n');
+        const noHeader = lines.slice(1);
+        for (let i = 0; i < noHeader.length; i += 1) {
+          if (noHeader[i]) {
+            const field = noHeader[i].toString().split(',');
+            if (Object.prototype.hasOwnProperty.call(students, field[3])) {
+              students[field[3]].push(field[0]);
             } else {
-              dict[line[idxFD]] = [];
-              dict[line[idxFD]].push(line[idxFN]);
+              students[field[3]] = [field[0]];
             }
           }
         }
-        resolve(dict);
+        resolve(students);
       }
     });
   });
-}
-module.exports = readDatabase;
+};
